@@ -29,7 +29,7 @@ resume_file = st.file_uploader("Upload Candidate Resume (PDF)", type=["pdf"])
 job_file = st.file_uploader("Upload Job Description (PDF)", type=["pdf"])
 
  
-if st.button("🚀 Generate Hiring Report"):
+if st.button("Generate Hiring Report"):
     if not api_key:
         st.warning("⚠️ Please enter your OpenAI API key in the sidebar.")
     elif not resume_file or not job_file:
