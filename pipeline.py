@@ -5,10 +5,9 @@ from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langgraph.graph import StateGraph, START, END
 
-import re
 import os
 
-llm = None  # will be initialized in run_pipeline
+llm = None   
 
 class HiringState(TypedDict):
     resume_path: str
@@ -24,7 +23,7 @@ class HiringState(TypedDict):
     decision: str
     recommendation: str
     final_report: str
-    candidate_name: str  # NEW: store candidate name
+    candidate_name: str   
 
 str_parser = StrOutputParser()
 
@@ -108,18 +107,18 @@ Job summary: {job_summary}
         "job_summary": state["job_summary"]
     })
 
-    # Ensure each component score exists and is numeric
+     
     for key in ["skills_score", "experience_score", "education_score"]:
         scores[key] = float(scores.get(key, 0))
 
-    # Compute deterministic overall score using the defined weights
+    
     scores["overall_score"] = (
         scores["skills_score"] * 0.5 +
         scores["experience_score"] * 0.3 +
         scores["education_score"] * 0.2
     )
 
-    # Update state
+     
     state.update(scores)
     print("Deterministic Scores:", scores)
     return state
@@ -143,7 +142,7 @@ def generate_report(state: HiringState) -> HiringState:
     recommendation = state.get("recommendation", "Not Available")
     candidate_name = state.get("candidate_name", "Unknown Candidate")
 
-    # Full report prompt in plain text format
+    
     report_prompt = PromptTemplate.from_template("""
 You are an HR assistant preparing a professional hiring recommendation report.
 Write the report neatly formatted in plain text (under 200 words). Use headings and separators,
@@ -164,7 +163,7 @@ Experience Score: 76/100
 Education Score: 92/100
 Overall Score: 84.2
 
-Recommendation: Two Interviews – Initial screening + coding round
+Recommendation: Two Interviews - Initial screening + coding round
 
 Summary:
 Candidate demonstrates strong alignment with required skills, education, and experience.
@@ -215,7 +214,7 @@ def execute_rejection(state: HiringState) -> HiringState:
         state.pop(key, None)
     return state
 
-# --- Workflow graph setup ---
+ #---workflow--
 workflow = StateGraph(HiringState)
 workflow.add_node("load_resume", load_resume)
 workflow.add_node("extract_candidate_name", extract_candidate_name)
@@ -250,8 +249,8 @@ for node in ["execute_one_interview", "execute_two_interviews", "execute_rejecti
     workflow.add_edge(node, END)
 
 graph = workflow.compile()
-
-# --- Run pipeline ---
+ 
+ 
 def run_pipeline(openai_key, resume_path, job_path):
     global llm
     os.environ["OPENAI_API_KEY"] = openai_key
